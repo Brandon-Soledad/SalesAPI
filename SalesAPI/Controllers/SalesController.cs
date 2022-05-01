@@ -6,18 +6,19 @@ using Newtonsoft.Json;
 
 namespace SalesAPI.Controllers
 {
-    public class SalesController
-    {
-        [Route("api/[controller]")]
+        
         [ApiController]
-        public class ListingController : ControllerBase
+        [Route("/api[controller]")]
+        public class SalesController : ControllerBase
         {
             // GET api/<ValuesController>/5
+            List<SalesInterface> listings = new List<SalesInterface>();
+   
             [HttpGet("{id}")]
             public SalesInterface Get(int id)
             {
                 //Testing Get
-                List<SalesInterface> listings = new List<SalesInterface>();
+                
 
                 for (int i = 0; i < 10; i++)
                 {
@@ -64,10 +65,11 @@ namespace SalesAPI.Controllers
 
             // DELETE api/<ValuesController>/5
             [HttpDelete("{id}")]
-            public void Delete(int id)
+            public void Delete(Guid id)
             {
-
+                var index = listings.FindIndex(post => post.UserID == id);
+                listings.RemoveAt(index);
             }
-        }
-    }
+
+       }
 }
