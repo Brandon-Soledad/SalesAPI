@@ -1,75 +1,79 @@
-﻿using SalesAPI.Data;
+﻿using SalesAPI.Data.Extensions;
+using SalesAPI.Data.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using Newtonsoft.Json;
+
 
 
 namespace SalesAPI.Controllers
 {
-        
-        [ApiController]
-        [Route("/api[controller]")]
-        public class SalesController : ControllerBase
+
+
+    [Route("/api[controller]")]
+    [ApiController]
+    public class SalesController : ControllerBase
+    {
+
+        public DataContext _context { get; }
+
+        public SalesController(DataContext context)
         {
-            // GET api/<ValuesController>/5
-            List<SalesInterface> listings = new List<SalesInterface>();
-   
-            [HttpGet("{id}")]
-            public SalesInterface Get(int id)
+            _context = context;
+        }
+
+
+        [HttpGet]
+        public async Task<ActionResult<List<SalesItem>>> Get()
+        {
+            return Ok(await _context.SalesItems.ToListAsync());
+        }
+        [HttpGet("{id}")]
+        public async Task<ActionResult<List<SalesItem>>> Get(int id)
+        {
+            var listing = await _context.SalesItems.FindAsync(id);
+            if (listing == null)
             {
-                //Testing Get
-                
-
-                for (int i = 0; i < 10; i++)
-                {
-                    listings.Add(new SalesInterface()
-                    {
-                        UserID = Guid.NewGuid(),
-                        Title = $"Title for {id}",
-                        ContactInfo = i.ToString(),
-                        Description = $"Description for {id}",
-                        Images = new List<string>() { "Image1" },
-                        ListingTime = DateTime.Now.AddDays(i),
-                        Location = DateTime.Now.AddDays(i).DayOfWeek.ToString()
-                    });
-                }
-
-                // If Id isn't found
-                SalesInterface def = new SalesInterface()
-                {
-                    UserID = new Guid(),
-                    Title = $"ID {id} NOT FOUND",
-                    Description = string.Empty,
-                    Images = new(),
-                    ListingTime = DateTime.MinValue,
-                    Location = string.Empty,
-                    ContactInfo = string.Empty
-                };
-
-                return listings.FirstOrDefault(l => l.ContactInfo == id.ToString()) ?? def;
+                return BadRequest("Listing not found");
             }
+            return Ok(listing);
+        }
 
-            // POST api/<ValuesController>
-            [HttpPost]
-            public void Post([FromBody] SalesInterface post)
+        // POST api/<ValuesController>
+        [HttpPost]
+        public async Task<ActionResult<List<SalesItem>>> Post(SalesItem salesPost)
+        {
+            _context.SalesItems.Add(salesPost);
+            await _context.SaveChangesAsync();
+            return Ok(await _context.SalesItems.ToListAsync());
+        }
+
+        // PUT api/<ValuesController>
+        [HttpPut("Update/{id}")]
+        public async Task<ActionResult<List<SalesItem>>> Put(int id, [FromBody]SalesItem salesPost)
+        {
+            var listing = await _context.SalesItems.FindAsync(id);
+
+            if (ModelState.IsValid && listing != null)
             {
-                Debug.WriteLine(JsonConvert.SerializeObject(post));
-            }
+                _context.SalesItems.Update(listing, salesPost);
+                await _context.SaveChangesAsync();
 
-            // PUT api/<ValuesController>/5
-            [HttpPut("{id}")]
-            public void Put(int id, [FromBody] string value)
+                return Ok(listing);
+            }
+            return NotFound();
+        }
+
+        [HttpDelete("Delete/{id}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var listing = await _context.SalesItems.FindAsync(id);
+
+            if (listing != null)
             {
-
+                _context.SalesItems.Remove(listing);
+                await _context.SaveChangesAsync();
+                return Ok();
             }
-
-            // DELETE api/<ValuesController>/5
-            [HttpDelete("{id}")]
-            public void Delete(Guid id)
-            {
-                var index = listings.FindIndex(post => post.UserID == id);
-                listings.RemoveAt(index);
-            }
-
-       }
+            return NotFound();
+        }
+    }
 }
