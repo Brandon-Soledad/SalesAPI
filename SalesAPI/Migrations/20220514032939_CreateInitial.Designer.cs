@@ -79,7 +79,7 @@ namespace SalesAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SalesInterfaces");
+                    b.ToTable("SalesItems");
                 });
 
             modelBuilder.Entity("SalesAPI.Data.ImageItem", b =>
