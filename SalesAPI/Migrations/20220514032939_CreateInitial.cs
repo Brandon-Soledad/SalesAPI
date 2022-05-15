@@ -10,7 +10,7 @@ namespace SalesAPI.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "SalesInterfaces",
+                name: "SalesItems",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -24,7 +24,7 @@ namespace SalesAPI.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SalesInterfaces", x => x.Id);
+                    table.PrimaryKey("PK_SalesItems", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -40,9 +40,9 @@ namespace SalesAPI.Migrations
                 {
                     table.PrimaryKey("PK_Images", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Images_SalesInterfaces_SalesItemId",
+                        name: "FK_Images_SalesItems_SalesItemId",
                         column: x => x.SalesItemId,
-                        principalTable: "SalesInterfaces",
+                        principalTable: "SalesItems",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -59,7 +59,7 @@ namespace SalesAPI.Migrations
                 name: "Images");
 
             migrationBuilder.DropTable(
-                name: "SalesInterfaces");
+                name: "SalesIems");
         }
     }
 }
